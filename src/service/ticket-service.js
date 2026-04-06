@@ -1,19 +1,20 @@
 const {TicketRepository} = require('../repository/index.js');
-const {Transport} = require('../config/emailConfig.js')
+const {transport} = require('../config/emailConfig.js')
 
-class EmailService{
+class TicketService{
     constructor(){
         this.ticketrepo = new TicketRepository();
     }
 
     async sendEmail(from,to,subject,text){
         try{
-            const response = Transport.sendEmail({
+            const response = await transport.sendMail({
                 from : from,
                 to : to,
                 subject : subject,
                 text : text
             })
+            console.log("Email sent:", response.response); // debug log
             return response;
         }catch(error){
             console.log("error in sending email",error);
@@ -22,7 +23,18 @@ class EmailService{
     }
     async createTicket(ticket){
         try{
-            const response  = await this.ticketrepo.createTicket(ticket);
+            const parsedDate = new Date(ticket.notificationTime);
+
+            if (isNaN(parsedDate)) {
+                throw new Error("Invalid notificationTime");
+            }
+
+            const data = {
+                ...ticket,
+                notificationTime: parsedDate.toISOString()
+            };
+    
+            const response = await this.ticketrepo.createTicket(data);
             return response;
         }catch(error){
             console.log("error in creating ticket",error);
@@ -70,5 +82,5 @@ class EmailService{
 
 }
 
-module.exports = EmailService;
+module.exports = TicketService;
 

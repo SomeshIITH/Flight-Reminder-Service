@@ -19,7 +19,7 @@ class TicketRepository{
 
     async getTicket(ticketTd){
         try{
-            const response = await this.notificationTicket.finfdByPk(ticketTd);
+            const response = await this.notificationTicket.findByPk(ticketTd);
             return response;
         }catch(error){
             console.log("error in getting ticket",error);
@@ -28,7 +28,7 @@ class TicketRepository{
     }
     async getAllTicket(filter){
         try{
-            const tickets = await this.notificationTicket.finadAll({
+            const tickets = await this.notificationTicket.findAll({
                 where : {
                     status : filter.status,
                     notificationTime : {
@@ -45,8 +45,11 @@ class TicketRepository{
     async updateTicket(ticketId,data){
         try{
             const ticket = await this.notificationTicket.findByPk(ticketId);
+            if (!ticket) {
+                throw new Error("Ticket not found");
+            }
             if(data.status)ticket.status = data.status;
-            if(data.notificationTime)ticket.notificationTicket = data.notificationTime;
+            if(data.notificationTime) ticket.notificationTime = data.notificationTime;
             await ticket.save();
             return ticket;
         }catch(error){

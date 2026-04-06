@@ -107,8 +107,13 @@ const sendEmail = async (req,res)=>{
                 subject : req.body.subject,
                 text : req.body.content
             }
-            const response = await TicketService.sendEmail(payload);
-            return response;
+            const response = await ticketService.sendEmail(payload);
+            return res.status(StatusCodes.ACCEPTED).json({
+                data : response,
+                success : true,
+                message : "Email sent successfully",
+                err : {}
+            });
         }
         else {
             return res.status(StatusCodes.BAD_REQUEST).json({
