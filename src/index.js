@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const {PORT} = require('./config/serverConfig.js');
 const apiRoutes = require('./routes/index.js');
 const db = require('./models/index.js');
+const jobs = require('./utils/job.js');
 
 const SetupServer = async () => {
     const app = express();
@@ -16,6 +17,7 @@ const SetupServer = async () => {
         // if(process.env.SYNC_DB){
         //     db.sequelize.sync({alter : true});
         // }
+        jobs();
         
     })
 }
