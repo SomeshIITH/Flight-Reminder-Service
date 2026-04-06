@@ -1,4 +1,4 @@
 //start
 module.exports ={
-    EmailService : require("./email-service")
+    TicketService : require("./ticket-service")
 }

@@ -1,5 +1,5 @@
-const {TicketRepository} = require('./../repository/index.js');
-const {Transport} = require('./../config/emailConfig.js')
+const {TicketRepository} = require('../repository/index.js');
+const {Transport} = require('../config/emailConfig.js')
 
 class EmailService{
     constructor(){
