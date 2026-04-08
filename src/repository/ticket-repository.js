@@ -1,15 +1,15 @@
-const {NotificationTicket} = require('./../models/index');
+const {Ticket} = require('./../models/index');
 const {Op} = require('sequelize');
 
 
 class TicketRepository{
     constructor(){
-        this.notificationTicket = NotificationTicket;
+        this.ticket = Ticket;
     }
 
-    async createTicket(ticket){
+    async createTicket(data){
         try{
-            const response = await this.notificationTicket.create(ticket);
+            const response = await this.ticket.create(data);
             return response;
         }catch(error){
             console.log("error in creating ticket",error);
@@ -17,34 +17,34 @@ class TicketRepository{
         }
     }
 
-    async getTicket(ticketTd){
+    async getTicket(ticketId){
         try{
-            const response = await this.notificationTicket.findByPk(ticketTd);
+            const response = await this.ticket.findByPk(ticketId);
             return response;
         }catch(error){
             console.log("error in getting ticket",error);
             throw error;
         }
     }
-    async getAllTicket(filter){
-        try{
-            const tickets = await this.notificationTicket.findAll({
-                where : {
-                    status : filter.status,
-                    notificationTime : {
-                        [Op.lte] : new Date()
-                    }   
+    async getPendingTickets() {
+        try {
+            const tickets = await this.ticket.findAll({
+                where: {
+                    status: 'PENDING',
+                    notificationTime: {
+                        [Op.lte]: new Date() 
+                    }
                 }
-            })
+            });
             return tickets;
-        }catch(error){
-            console.log("error in getting all tickets",error);
+        } catch (error) {
+            console.error("Repository Error [getPendingTickets]:", error);
             throw error;
         }
     }
     async updateTicket(ticketId,data){
         try{
-            const ticket = await this.notificationTicket.findByPk(ticketId);
+            const ticket = await this.ticket.findByPk(ticketId);
             if (!ticket) {
                 throw new Error("Ticket not found");
             }
@@ -60,7 +60,7 @@ class TicketRepository{
 
     async destroyTicket(ticketId){
         try{
-            const response = await this.notificationTicket.destroy({
+            const response = await this.ticket.destroy({
                 where : {
                     id : ticketId
                 }
