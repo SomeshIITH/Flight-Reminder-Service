@@ -5,6 +5,13 @@ const apiRoutes = require('./routes/index.js');
 const db = require('./models/index.js');
 const jobs = require('./utils/job.js');
 
+const {createChannel,subscribeMessage} = require('./utils/message-queue');
+const {REMINDER_BINDING_KEY} = require('./config/serverConfig');
+const {TicketService} = require('./service/index')
+const ticketService = new TicketService();
+
+
+
 const SetupServer = async () => {
     const app = express();
     app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,10 +21,12 @@ const SetupServer = async () => {
     app.listen(PORT,async () => {
         console.log(PORT);
         console.log(`Server is running on http://localhost:${PORT}`);
+        const channel = await createChannel();
+        subscribeMessage(channel,ticketService,REMINDER_BINDING_KEY);
         // if(process.env.SYNC_DB){
         //     db.sequelize.sync({alter : true});
         // }
-        jobs();
+        // jobs();
         
     })
 }

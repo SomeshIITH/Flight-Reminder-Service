@@ -1,44 +1,41 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
-  class NotificationTicket extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+  class Ticket extends Model {
     static associate(models) {
-      // define association here
+      // Define associations here
     }
   }
-  NotificationTicket.init({
-    subject:{
-      type :  DataTypes.STRING,
-      allowNull : false
+  Ticket.init({
+    subject: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
     content: {
-      type : DataTypes.STRING,
-      allowNull : false
+      type: DataTypes.TEXT, //  TEXT allows for long HTML/itinerary content
+      allowNull: false
     },
-    recepientEmail:{
-      type : DataTypes.STRING,
-      allowNull : false
+    recipientEmail: { 
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isEmail: true
+      }
     },
     status: {
-      type : DataTypes.ENUM,
-      allowNull : false,
-      values : ["PENDING","SUCCESS","FAILED"],
-      defaultValue : "PENDING"
+      type: DataTypes.ENUM,
+      allowNull: false,
+      values: ["PENDING", "SUCCESS", "FAILED"],
+      defaultValue: "PENDING"
     },
-    notificationTime:{
-      type :  DataTypes.DATE,
-      allowNull : false
+    notificationTime: {
+      type: DataTypes.DATE,
+      allowNull: false
     }
   }, {
     sequelize,
-    modelName: 'NotificationTicket',
+    modelName: 'Ticket', 
   });
-  return NotificationTicket;
+  return Ticket;
 };

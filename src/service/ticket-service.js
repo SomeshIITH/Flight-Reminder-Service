@@ -79,6 +79,32 @@ class TicketService{
             throw error;
         }
     }
+    async subsribeEvents(payload){
+        try{
+            let service = payload.service;
+            let data = payload.data;
+            switch(service){
+                case  "DUMMY" :
+                    console.log("dummy function called");
+                    break;
+
+                case "CREATE_EMAIL" : 
+                    await this.createTicket(data);
+                    break;
+
+                case "SEND_EMAIL" :
+                    await this.sendEmail(data.from,data.to,data.subject,data.text);
+                    break;
+
+                default :
+                    console.log("Invalid service");
+                    break;
+            }
+        }catch(error){
+            console.log("error in dummy function",error);
+            throw error;
+        }
+    }
 
 }
 
