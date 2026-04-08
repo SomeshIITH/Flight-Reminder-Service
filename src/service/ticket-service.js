@@ -89,6 +89,15 @@ class TicketService{
             throw error;
         }
     }
+    async getPendingTickets(){
+        try{
+            const response = await this.ticketRepo.getPendingTickets();
+            return response;
+        }catch(error){
+            console.log("error in getting pending tickets",error);
+            throw error;
+        }
+    }
 
     async updateTicket(ticketId,data){
         try{

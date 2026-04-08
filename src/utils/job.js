@@ -1,32 +1,36 @@
 const cron = require('node-cron');
 const { TicketService } = require('./../service/index');
-const { EMAIL_ID } = require('./../config/serverConfig');
-
-const emailService = new TicketService();
+const ticketService = new TicketService();
 
 const setupCronJob = async () => {
     cron.schedule('*/2 * * * *', async () => {
         console.log('running a task every 2 minute');
 
         try {
-            const tickets = await emailService.getAllTicket({ status: "PENDING" });
+            const tickets = await ticketService.getPendingTickets();
+
+            if(tickets.length === 0) {
+                console.log("No pending tasks to process.");
+                return;
+            }
 
             for (const ticket of tickets) {
-                console.log(ticket);
                 try {
-                    await emailService.sendEmail(
-                        EMAIL_ID,
-                        ticket.recepientEmail,
-                        ticket.subject,
-                        ticket.content
-                    );
+                    // 1. Attempt to send the email
+                    await ticketService.sendMail({
+                        recipientEmail: ticket.recipientEmail,
+                        subject: ticket.subject,
+                        content: ticket.content
+                    });
 
-                    await emailService.updateTicket(ticket.id, { status: "SUCCESS" });
+                    // 2. Mark as SUCCESS on completion
+                    await ticketService.updateTicket(ticket.id, { status: "SUCCESS" });
+                    console.log(`Successfully processed ticket ID: ${ticket.id}`);
 
                 } catch (error) {
-                    console.log("Email failed for ticket:", ticket.id);
-
-                    await emailService.updateTicket(ticket.id, { status: "FAILED" });
+                    console.error(`Failed to process ticket ID: ${ticket.id}. marking as FAILED.`);
+                    // 4. Mark as FAILED so we can audit/retry later
+                    await ticketService.updateTicket(ticket.id, { status: "FAILED" });
                 }
             }
 
