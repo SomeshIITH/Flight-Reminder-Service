@@ -3,7 +3,7 @@ const {StatusCodes} = require('http-status-codes');
 const {EMAIL_ID} = require('./../config/serverConfig.js');
 const ticketService = new TicketService();
 
-const create = async (req,res) => {
+const create = async (req,res,next) => {
     try{
         const ticket = await ticketService.createTicket(req.body);
         return res.status(StatusCodes.ACCEPTED).json({
@@ -13,16 +13,11 @@ const create = async (req,res) => {
             err : {}
         })
     }catch(error){
-        return res.status(StatusCodes.BAD_REQUEST).json({
-            data : {},
-            success : false,
-            message : "Error in creating ticket",
-            err : {message : error.message , stack : error.stack}
-        })
+        next(error);
     }
 }
 
-const get = async (req,res) => {
+const get = async (req,res,next) => {
     try{
         const ticket = await ticketService.getTicket(req.params.id);
         return res.status(StatusCodes.ACCEPTED).json({
@@ -32,35 +27,12 @@ const get = async (req,res) => {
             err : {}
         })
     }catch(error){
-        return res.status(StatusCodes.BAD_REQUEST).json({
-            data : {},
-            success : false,
-            message : "Error in getting ticket",
-            err :{message : error.message , stack : error.stack}
-        })
+        next(error);
     }
 }
 
-const getAll = async (req,res) => {
-    try{
-        const tickets = await ticketService.getAllTicket(req.query);
-        return res.status(StatusCodes.ACCEPTED).json({
-            data : tickets,
-            success : true,
-            message : "Tickets fetched successfully",
-            err : {}
-        })
-    }catch(error){
-        return res.status(StatusCodes.BAD_REQUEST).json({
-            data : {},
-            success : false,
-            message : "Error in getting tickets",
-            err :{message : error.message , stack : error.stack}
-        })
-    }
-}
 
-const update = async (req,res) => {
+const update = async (req,res,next) => {
     try{
         const ticket = await ticketService.updateTicket(req.params.id,req.body);
         return res.status(StatusCodes.ACCEPTED).json({
@@ -70,16 +42,11 @@ const update = async (req,res) => {
             err : {}
         })
     }catch(error){
-        return res.status(StatusCodes.BAD_REQUEST).json({
-            data : {},
-            success : false,
-            message : "Error in updating ticket",
-            err :{message : error.message , stack : error.stack}
-        })
+       next(error);
     }
 }
 
-const destroy = async (req,res) => {
+const destroy = async (req,res,next) => {
     try{
         const ticket = await ticketService.destroyTicket(req.params.id);
         return res.status(StatusCodes.ACCEPTED).json({
@@ -89,55 +56,28 @@ const destroy = async (req,res) => {
             err : {}
         })
     }catch(error){
-        return res.status(StatusCodes.BAD_REQUEST).json({
-            data : {},
-            success : false,
-            message : "Error in deleting ticket",
-            err : {message : error.message , stack : error.stack}
-        })
+        next(error);
     }
 }
 
-const sendEmail = async (req,res)=>{
+const sendMail = async (req,res,next)=>{
     try{
-        if(req.body.subject && req.body.content && req.body.recepientEmail && req.body.status && req.body.notificationTime){
-            const payload = {
-                from  : EMAIL_ID,
-                to : req.body.recepientEmail,
-                subject : req.body.subject,
-                text : req.body.content
-            }
-            const response = await ticketService.sendEmail(payload);
-            return res.status(StatusCodes.ACCEPTED).json({
-                data : response,
-                success : true,
-                message : "Email sent successfully",
-                err : {}
-            });
-        }
-        else {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-                data : {},
-                success : false,
-                message : "Missing required fields",
-                err : {}
-            })
-        }
-    }catch(error){
-        return res.status(StatusCodes.BAD_REQUEST).json({
-            data : {},
-            success : false,
-            message : "Error in sending email",
-            err :{message : error.message , stack : error.stack}
+        const response = await ticketService.sendMail(req.body);
+        return res.status(StatusCodes.ACCEPTED).json({
+            data : response,
+            success : true,
+            message : "Email sent successfully",
+            err : {}
         })
+    }catch(error){
+        next(error);
     }
 }
 
 module.exports = {
     create,
     get,
-    getAll,
     update,
     destroy,
-    sendEmail
+    sendMail
 }

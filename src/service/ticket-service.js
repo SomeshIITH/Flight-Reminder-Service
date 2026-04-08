@@ -39,7 +39,7 @@ class TicketService{
         }
     }
 
-    async sendEmail(mailData){
+    async sendMail(mailData){
         try{
             const response = await transport.sendMail({
                 from : EMAIL_ID,
